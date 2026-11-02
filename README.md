@@ -32,3 +32,10 @@ Override it with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` environment variables, a
 The SQLite database is stored in `safety_app/instance/` (override with `VOLTSAFE_DB`).
 
 Course content and the substation layout are in `safety_app/content.py`.
+
+## Website version (no server needed)
+
+`website/` holds a standalone version of VoltSafe written in plain HTML, CSS and JavaScript. It has the same courses, quizzes, certificates, interactive substation map, check-in/out with role rules, and a gate log for emergency roll-calls. It runs entirely in the browser and keeps its data in that browser's local storage, which suits a shared tablet at the substation gate.
+
+- Open `website/index.html` in a browser, or host the `website/` folder on any static host such as GitHub Pages.
+- After editing `safety_app/content.py`, run `python website/build.py` to regenerate `website/content.js` and `website/index.html`. Edit `website/page.html` for layout changes.

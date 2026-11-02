@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VoltSafe Academy</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Substation safety training for visitors, new engineers and experienced engineers, with a site map that remembers every area visited.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky glass header, one routed view at a time, cards on a glowing gradient ground.
+   Palette follows the VoltSafe Flask app: Daylight (light), Midnight Volt (dark), plus Aurora and Ember skins. */
+:root {
+  --bg: #f4f6fb; --bg-2: #e8ecf6;
+  --surface: rgba(255,255,255,.78); --surface-strong: #ffffff; --border: rgba(15,23,42,.10);
+  --text: #0f172a; --muted: #566074;
+  --primary: #0277b6; --primary-2: #7c3aed; --on-primary: #ffffff;
+  --glow-1: rgba(2,132,199,.16); --glow-2: rgba(124,58,237,.14);
+  --ok: #047857; --warn: #a35107; --danger: #c81e1e;
+  --shadow: 0 18px 40px -24px rgba(15,23,42,.35);
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #070b17; --bg-2: #0d1426;
+    --surface: rgba(255,255,255,.05); --surface-strong: rgba(255,255,255,.09); --border: rgba(255,255,255,.11);
+    --text: #e8edf7; --muted: #8f9bb4;
+    --primary: #22d3ee; --primary-2: #6366f1; --on-primary: #04121a;
+    --glow-1: rgba(34,211,238,.26); --glow-2: rgba(99,102,241,.28);
+    --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+    --shadow: 0 20px 50px -20px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #070b17; --bg-2: #0d1426;
+  --surface: rgba(255,255,255,.05); --surface-strong: rgba(255,255,255,.09); --border: rgba(255,255,255,.11);
+  --text: #e8edf7; --muted: #8f9bb4;
+  --primary: #22d3ee; --primary-2: #6366f1; --on-primary: #04121a;
+  --glow-1: rgba(34,211,238,.26); --glow-2: rgba(99,102,241,.28);
+  --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+  --shadow: 0 20px 50px -20px rgba(0,0,0,.7);
+  color-scheme: dark;
+}
+/* Skins chosen in the header override the automatic light/dark palette. */
+:root[data-skin="midnight"] {
+  --bg: #070b17; --bg-2: #0d1426;
+  --surface: rgba(255,255,255,.05); --surface-strong: rgba(255,255,255,.09); --border: rgba(255,255,255,.11);
+  --text: #e8edf7; --muted: #8f9bb4;
+  --primary: #22d3ee; --primary-2: #6366f1; --on-primary: #04121a;
+  --glow-1: rgba(34,211,238,.26); --glow-2: rgba(99,102,241,.28);
+  --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+  --shadow: 0 20px 50px -20px rgba(0,0,0,.7); color-scheme: dark;
+}
+:root[data-skin="aurora"] {
+  --bg: #0b0716; --bg-2: #160d2b;
+  --surface: rgba(255,255,255,.05); --surface-strong: rgba(255,255,255,.10); --border: rgba(216,180,254,.17);
+  --text: #f3eaff; --muted: #ad9fc8;
+  --primary: #c084fc; --primary-2: #2dd4bf; --on-primary: #1a0b2e;
+  --glow-1: rgba(192,132,252,.30); --glow-2: rgba(45,212,191,.24);
+  --ok: #4ade80; --warn: #facc15; --danger: #fb7185;
+  --shadow: 0 20px 50px -20px rgba(0,0,0,.75); color-scheme: dark;
+}
+:root[data-skin="ember"] {
+  --bg: #120a06; --bg-2: #1e120a;
+  --surface: rgba(255,255,255,.045); --surface-strong: rgba(255,255,255,.09); --border: rgba(251,191,36,.17);
+  --text: #fdf2e6; --muted: #bea791;
+  --primary: #fb923c; --primary-2: #facc15; --on-primary: #1c0d02;
+  --glow-1: rgba(251,146,60,.28); --glow-2: rgba(239,68,68,.20);
+  --ok: #86efac; --warn: #fde047; --danger: #f87171;
+  --shadow: 0 20px 50px -20px rgba(0,0,0,.75); color-scheme: dark;
+}
+:root[data-skin="daylight"] {
+  --bg: #f4f6fb; --bg-2: #e8ecf6;
+  --surface: rgba(255,255,255,.78); --surface-strong: #ffffff; --border: rgba(15,23,42,.10);
+  --text: #0f172a; --muted: #566074;
+  --primary: #0277b6; --primary-2: #7c3aed; --on-primary: #ffffff;
+  --glow-1: rgba(2,132,199,.16); --glow-2: rgba(124,58,237,.14);
+  --ok: #047857; --warn: #a35107; --danger: #c81e1e;
+  --shadow: 0 18px 40px -24px rgba(15,23,42,.35); color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { background: var(--bg-2); }
+body {
+  margin: 0; min-height: 100vh; font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--text);
+  background:
+    radial-gradient(60rem 40rem at 8% -10%, var(--glow-1), transparent 60%),
+    radial-gradient(50rem 35rem at 110% 8%, var(--glow-2), transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg-2));
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--bg); }
+a { color: var(--primary); }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.15; margin: 0; letter-spacing: -.02em; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 5.2vw, 3.5rem); }
+h2 { font-size: clamp(1.35rem, 3vw, 1.9rem); }
+h3 { font-size: 1.12rem; }
+p { margin: 0; }
+button { font: inherit; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+.wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.muted { color: var(--muted); }
+.small { font-size: .86rem; }
+.gradient-text { background: linear-gradient(90deg, var(--primary), var(--primary-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: .76rem; font-weight: 700; color: var(--primary); }
+
+/* header */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; background: color-mix(in srgb, var(--bg) 78%, transparent); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border-bottom: 1px solid var(--border); }
+.top-inner { display: flex; align-items: center; gap: 12px; padding-block: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.12rem; color: var(--text); text-decoration: none; font-family: var(--font-display); }
+.brand-mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow: 0 0 22px var(--glow-1); }
+.brand-mark svg { width: 18px; height: 18px; fill: var(--on-primary); }
+nav.links { display: flex; gap: 2px; margin-left: auto; flex-wrap: wrap; align-items: center; }
+nav.links a { color: var(--muted); padding: 7px 12px; border-radius: 10px; font-weight: 500; font-size: .94rem; text-decoration: none; }
+nav.links a:hover, nav.links a[aria-current="page"] { color: var(--text); background: var(--surface-strong); }
+.skins { display: flex; gap: 5px; padding: 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); }
+.skin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+.skin[aria-pressed="true"] { border-color: var(--text); }
+.skin[data-skin="auto"] { background: conic-gradient(#0f172a 0 50%, #f4f6fb 0); }
+.skin[data-skin="midnight"] { background: linear-gradient(135deg, #22d3ee, #6366f1); }
+.skin[data-skin="aurora"] { background: linear-gradient(135deg, #c084fc, #2dd4bf); }
+.skin[data-skin="ember"] { background: linear-gradient(135deg, #fb923c, #ef4444); }
+.skin[data-skin="daylight"] { background: linear-gradient(135deg, #ffffff, #cbd5e1); }
+.who { display: flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); font-size: .88rem; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .8rem; color: var(--on-primary); background: linear-gradient(135deg, var(--primary), var(--primary-2)); flex: none; }
+
+main { padding-block: 28px 64px; }
+.view { display: grid; gap: 24px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: var(--shadow); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); min-width: 0; }
+.plain { background: none; border: 0; box-shadow: none; padding: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.grid { display: grid; gap: 18px; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); }
+.g4 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); }
+.split { grid-template-columns: minmax(0, 1.6fr) minmax(min(100%, 300px), 1fr); align-items: start; }
+@media (max-width: 900px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.between { justify-content: space-between; }
+.stack { display: grid; gap: 12px; align-content: start; min-width: 0; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 20px; border-radius: 13px; font-weight: 600; font-size: .96rem; border: 1px solid var(--border); background: var(--surface-strong); color: var(--text); cursor: pointer; text-decoration: none; transition: transform .15s, filter .2s, box-shadow .2s; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary { border: 0; color: var(--on-primary); background: linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow: 0 10px 28px -12px var(--glow-1); }
+.btn-primary:hover { filter: brightness(1.07); }
+.btn-sm { padding: 7px 13px; font-size: .86rem; border-radius: 10px; }
+.btn-danger { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); border-color: color-mix(in srgb, var(--danger) 40%, transparent); }
+.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px; border-radius: 999px; font-size: .78rem; font-weight: 600; background: var(--surface-strong); border: 1px solid var(--border); white-space: nowrap; }
+.pill.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+.pill.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+.pill.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.risk-low { color: var(--ok); } .risk-medium { color: var(--warn); } .risk-high { color: var(--danger); }
+
+.notice { padding: 13px 16px; border-radius: 14px; background: var(--surface-strong); border: 1px solid var(--border); }
+.notice.ok { border-color: color-mix(in srgb, var(--ok) 50%, transparent); }
+.notice.error { border-color: color-mix(in srgb, var(--danger) 55%, transparent); color: var(--danger); }
+#toast { background: color-mix(in srgb, var(--bg) 90%, var(--primary)); position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 80; max-width: min(560px, calc(100% - 32px)); box-shadow: var(--shadow); }
+
+/* forms */
+form.f { display: grid; gap: 16px; }
+label.fld { display: grid; gap: 6px; font-weight: 600; font-size: .9rem; }
+input[type="text"] { width: 100%; padding: 11px 13px; border-radius: 12px; font: inherit; color: var(--text); background: var(--surface-strong); border: 1px solid var(--border); }
+input[type="text"]:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px var(--glow-1); }
+.roles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
+.role input { position: absolute; opacity: 0; }
+.role .tile { display: grid; gap: 4px; padding: 15px; border-radius: 16px; cursor: pointer; height: 100%; background: var(--surface); border: 1.5px solid var(--border); font-weight: 400; }
+.role input:checked + .tile { border-color: var(--primary); box-shadow: 0 0 0 4px var(--glow-1); }
+.role input:focus-visible + .tile { outline: 3px solid var(--primary); }
+.role-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--primary) 16%, transparent); color: var(--primary); }
+.role-ic svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 28px; align-items: center; padding-block: 18px 6px; }
+.hero .lead { font-size: 1.12rem; color: var(--muted); max-width: 58ch; margin-top: 14px; }
+.hero svg { width: 100%; height: auto; }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; } }
+.stat { font-family: var(--font-display); font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* course */
+.ring { --p: 0; width: 104px; aspect-ratio: 1; max-width: 100%; border-radius: 50%; display: grid; place-items: center; flex: none; background: conic-gradient(var(--primary) calc(var(--p) * 1%), var(--surface-strong) 0); }
+.ring span { width: 82px; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: var(--bg-2); font-weight: 700; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.modules { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.modules button { width: 100%; text-align: left; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); cursor: pointer; }
+.modules button:hover { border-color: var(--primary); }
+.modules button[aria-current="step"] { border-color: var(--primary); box-shadow: 0 0 0 3px var(--glow-1); }
+.check { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: none; border: 2px solid var(--border); font-size: .82rem; font-weight: 700; }
+.check.done { background: var(--ok); border-color: var(--ok); color: var(--bg); }
+.points { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: pt; }
+.points li { counter-increment: pt; position: relative; padding: 14px 16px 14px 60px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); }
+.points li::before { content: counter(pt); position: absolute; left: 14px; top: 13px; width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; font-weight: 700; color: var(--on-primary); background: linear-gradient(135deg, var(--primary), var(--primary-2)); }
+.bar { height: 8px; border-radius: 999px; background: var(--surface-strong); overflow: hidden; }
+.bar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--primary), var(--primary-2)); }
+
+/* quiz */
+fieldset.q { border: 1px solid var(--border); margin: 0; }
+fieldset.q legend { padding: 0 8px; }
+.opts { display: grid; gap: 8px; margin-top: 12px; }
+.opt { display: flex; gap: 12px; align-items: center; padding: 11px 14px; border-radius: 12px; cursor: pointer; background: var(--surface); border: 1.5px solid var(--border); font-weight: 500; }
+.opt:has(input:checked) { border-color: var(--primary); box-shadow: 0 0 0 3px var(--glow-1); }
+.opt input { accent-color: var(--primary); }
+.opt.right { border-color: var(--ok); }
+.opt.wrong { border-color: var(--danger); }
+.mark { width: 20px; flex: none; text-align: center; font-weight: 700; }
+.opt.right .mark { color: var(--ok); } .opt.wrong .mark { color: var(--danger); }
+
+/* map */
+.map-wrap { overflow-x: auto; max-width: 100%; }
+.site-map { width: 100%; min-width: 600px; height: auto; display: block; color: var(--text); }
+.zone rect { fill: var(--surface-strong); stroke: var(--border); stroke-width: 2; cursor: pointer; transition: stroke .2s, fill .2s; }
+.zone:hover rect, .zone:focus rect { stroke: var(--primary); }
+.zone:focus { outline: none; }
+.zone.visited rect { fill: color-mix(in srgb, var(--ok) 22%, transparent); stroke: var(--ok); }
+.zone.locked rect { fill: url(#hatch); }
+.zone.selected rect { stroke: var(--primary-2); stroke-width: 4; }
+.zone.here rect { stroke: var(--primary); stroke-width: 4; animation: pulse 1.6s ease-in-out infinite; }
+.site-map text { fill: var(--text); font-size: 15px; font-weight: 600; pointer-events: none; font-family: var(--font-body); }
+.site-map .sub { fill: var(--muted); font-size: 12px; font-weight: 500; }
+@keyframes pulse { 50% { stroke-opacity: .35; } }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .84rem; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 14px; height: 14px; border-radius: 4px; vertical-align: -2px; margin-right: 6px; border: 2px solid var(--border); }
+.legend .l-v { background: color-mix(in srgb, var(--ok) 30%, transparent); border-color: var(--ok); }
+.legend .l-h { border-color: var(--primary); }
+.legend .l-l { background: repeating-linear-gradient(45deg, var(--border) 0 3px, transparent 3px 7px); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { padding: 3px 10px; border-radius: 999px; background: var(--surface-strong); border: 1px solid var(--border); font-size: .82rem; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 9px 11px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; }
+
+.cert { text-align: center; padding: 48px 24px; position: relative; overflow: hidden; display: grid; gap: 10px; justify-items: center; }
+.cert::before { content: ""; position: absolute; inset: 12px; border-radius: 14px; border: 2px dashed var(--border); pointer-events: none; }
+.seal { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--primary), var(--primary-2)); box-shadow: 0 0 40px var(--glow-1); }
+.seal svg { width: 40px; height: 40px; fill: var(--on-primary); }
+
+footer { border-top: 1px solid var(--border); padding-block: 24px; color: var(--muted); font-size: .86rem; }
+.fade { animation: fade .45s ease both; }
+@keyframes fade { from { transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="brand" href="#home"><span class="brand-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></span>VoltSafe</a>
+    <nav class="links" aria-label="Main">
+      <a href="#home" data-nav="home">Home</a>
+      <a href="#course" data-nav="course">My course</a>
+      <a href="#map" data-nav="map">Substation map</a>
+      <a href="#gate" data-nav="gate">Gate log</a>
+    </nav>
+    <div class="skins" role="group" aria-label="Colour theme">
+      <button class="skin" data-skin="auto" title="Match my device" aria-label="Automatic theme"></button>
+      <button class="skin" data-skin="midnight" title="Midnight Volt" aria-label="Midnight Volt theme"></button>
+      <button class="skin" data-skin="aurora" title="Aurora" aria-label="Aurora theme"></button>
+      <button class="skin" data-skin="ember" title="Ember" aria-label="Ember theme"></button>
+      <button class="skin" data-skin="daylight" title="Daylight" aria-label="Daylight theme"></button>
+    </div>
+    <div id="who"></div>
+  </div>
+</header>
+
+<main class="wrap"><div id="app" class="view"></div></main>
+
+<footer>
+  <div class="wrap row between">
+    <span>VoltSafe Substation Safety Academy · Educ8Africa</span>
+    <span>Treat every conductor as live until it has been proved dead.</span>
+  </div>
+</footer>
+<div id="toast" class="notice" hidden role="status" aria-live="polite"></div>
+
+<script src="content.js"></script>
+<script>
+(function () {
+  "use strict";
+  var C = window.VOLTSAFE;
+  var ROLES = C.ROLES, TRACKS = C.TRACKS, AREAS = C.AREAS, PASS = C.PASS_MARK;
+  var AREA = {}; AREAS.forEach(function (a) { AREA[a.code] = a; });
+  var DAY = 864e5;
+  var KEY = "voltsafe-site-v1";
+
+  /* ---------------- storage (this device only) ---------------- */
+  function blank() { return { people: {}, visits: [], current: null, skin: "auto" }; }
+  var S = blank();
+  try { var raw = localStorage.getItem(KEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch (e) { /* storage blocked: keep in memory */ }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } }
+
+  /* ---------------- helpers ---------------- */
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function fmt(ts) { if (!ts) return "–"; var d = new Date(ts); return d.toLocaleDateString(undefined, { day: "2-digit", month: "short", year: "numeric" }) + ", " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }); }
+  function initials(n) { return n.split(/\s+/).filter(Boolean).slice(0, 2).map(function (w) { return w[0].toUpperCase(); }).join(""); }
+  function me() { return S.current && S.people[S.current] || null; }
+  var app = document.getElementById("app");
+  var toastT;
+  function toast(msg, kind) {
+    var t = document.getElementById("toast");
+    t.className = "notice " + (kind || "ok"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastT); toastT = setTimeout(function () { t.hidden = true; }, 4200);
+  }
+
+  var ICONS = {
+    visitor: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.7-1.6 1.8-2.3 3-2.3s2.3.7 3 2.3M15 10h3M15 14h3"/></svg>',
+    "new": '<svg viewBox="0 0 24 24"><path d="M4 15a8 8 0 0 1 16 0"/><path d="M2 15h20v2H2zM12 7V4M9 7.5 8 5M15 7.5 16 5"/></svg>',
+    experienced: '<svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>'
+  };
+  var BOLT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>';
+
+  /* ---------------- training logic (mirrors safety_app/app.py) ---------------- */
+  function lastPass(p, track) {
+    var a = (p.attempts || []).filter(function (x) { return x.track === track && x.passed; });
+    return a.length ? a[a.length - 1] : null;
+  }
+  function activeTrack(p) {
+    if (p.role === "new") {
+      var ob = lastPass(p, "new");
+      if (ob && ob.at + TRACKS["new"].validity_days * DAY < Date.now()) return "experienced";
+    }
+    return ROLES[p.role].track;
+  }
+  function status(p) {
+    var key = activeTrack(p), t = TRACKS[key];
+    var done = (p.progress && p.progress[key]) || [];
+    var passed = lastPass(p, key);
+    var until = passed ? passed.at + t.validity_days * DAY : null;
+    var state = until && until >= Date.now() ? "valid" : until ? "expired" : done.length ? "in_progress" : "not_started";
+    var n = t.modules.filter(function (m) { return done.indexOf(m.slug) > -1; }).length;
+    return { key: key, track: t, done: done, n: n, total: t.modules.length, all: n === t.modules.length,
+      passed: passed, until: until, days: until ? Math.floor((until - Date.now()) / DAY) : null, state: state };
+  }
+  function openVisit(pid) { for (var i = S.visits.length - 1; i >= 0; i--) if (S.visits[i].pid === pid && !S.visits[i].out) return S.visits[i]; return null; }
+  function visitedBy(pid) {
+    var v = {};
+    S.visits.forEach(function (x) { if (x.pid !== pid) return; var r = v[x.area] || (v[x.area] = { n: 0, last: 0 }); r.n++; r.last = Math.max(r.last, x["in"]); });
+    return v;
+  }
+  function statusPill(st) {
+    if (st.state === "valid") return '<span class="pill ok"><i class="dot"></i>Cleared for site · ' + st.days + " days left</span>";
+    if (st.state === "expired") return '<span class="pill danger"><i class="dot"></i>Expired: refresher needed</span>';
+    if (st.state === "in_progress") return '<span class="pill warn"><i class="dot"></i>Training in progress</span>';
+    return '<span class="pill"><i class="dot"></i>Not started</span>';
+  }
+
+  /* ---------------- map ---------------- */
+  function siteMap(opts) {
+    opts = opts || {};
+    var visited = opts.visited || {}, here = opts.here, role = opts.role, sel = opts.selected;
+    var z = AREAS.map(function (a) {
+      var v = visited[a.code], cls = ["zone"];
+      if (v) cls.push("visited");
+      if (here && here.area === a.code) cls.push("here");
+      if (role && a.allowed.indexOf(role) < 0) cls.push("locked");
+      if (sel === a.code) cls.push("selected");
+      var sub = a.risk.toUpperCase() + " RISK" + (v ? " · ✓ " + v.n + " visit" + (v.n === 1 ? "" : "s") : "") + (here && here.area === a.code ? " · YOU" : "");
+      return '<g class="' + cls.join(" ") + '" data-zone="' + a.code + '" tabindex="0" role="button" aria-label="' + esc(a.name + (v ? ", visited " + v.n + " times" : "")) + '">' +
+        "<title>" + esc(a.name) + "</title>" +
+        '<rect x="' + a.x + '" y="' + a.y + '" width="' + a.w + '" height="' + a.h + '" rx="14"></rect>' +
+        '<text x="' + (a.x + 14) + '" y="' + (a.y + 28) + '">' + esc(a.short || a.name) + "</text>" +
+        '<text class="sub" x="' + (a.x + 14) + '" y="' + (a.y + 48) + '">' + sub + "</text></g>";
+    }).join("");
+    return '<div class="map-wrap"><svg class="site-map" viewBox="0 0 1000 600" role="group" aria-label="Power substation site map">' +
+      '<defs><pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="transparent"></rect><line x1="0" y1="0" x2="0" y2="10" stroke="currentColor" stroke-opacity=".18" stroke-width="4"></line></pattern></defs>' +
+      '<rect x="10" y="10" width="980" height="580" rx="24" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-dasharray="10 8" stroke-width="2"></rect>' +
+      z + "</svg></div>" +
+      '<div class="legend"><span><i class="l-v"></i>Visited</span><span><i class="l-h"></i>You are here</span>' +
+      (role ? '<span><i class="l-l"></i>Not open to your role</span>' : "") + "<span>Select a zone for hazards, PPE and check-in</span></div>";
+  }
+
+  /* ---------------- views ---------------- */
+  var ui = { lesson: 0, zone: null, result: null, confirmReset: false, switching: false };
+
+  function vHome() {
+    var p = me();
+    var lessons = 0; Object.keys(TRACKS).forEach(function (k) { lessons += TRACKS[k].modules.length; });
+    var roleCards = Object.keys(ROLES).map(function (k) {
+      var r = ROLES[k], t = TRACKS[r.track], mins = t.modules.reduce(function (s, m) { return s + m.minutes; }, 0);
+      return '<article class="card stack"><div class="row between"><span class="role-ic">' + ICONS[k] + '</span><span class="pill">' + esc(r.label) + "</span></div>" +
+        "<h3>" + esc(t.title) + '</h3><p class="muted">' + esc(r.blurb) + "</p>" +
+        '<ul class="muted small" style="margin:0;padding-left:18px">' + t.modules.map(function (m) { return "<li>" + esc(m.title) + "</li>"; }).join("") + "</ul>" +
+        '<div class="row between"><span class="muted small">' + mins + " min · valid " + t.validity_days + ' days</span><a class="btn btn-sm btn-primary" href="#join" data-role="' + k + '">Enrol</a></div></article>';
+    }).join("");
+    return '<section class="hero fade"><div>' +
+      '<div class="eyebrow">Substation Safety Academy</div>' +
+      '<h1 style="margin-top:10px">Train smart. <span class="gradient-text">Work live-safe.</span></h1>' +
+      '<p class="lead">Everyone who passes the substation gate gets the right safety training. Visitors take a short induction, new engineers take the full onboarding course, and experienced engineers take a refresher. VoltSafe then remembers every area each person visits.</p>' +
+      '<div class="row" style="margin-top:22px">' + (p ? '<a class="btn btn-primary" href="#course">Continue my course</a>' : '<a class="btn btn-primary" href="#join">Start your training</a>') +
+      '<a class="btn" href="#map">View the substation map</a></div></div>' +
+      '<svg viewBox="0 0 400 300" aria-hidden="true"><defs><linearGradient id="hg" x1="0" x2="1"><stop offset="0" stop-color="var(--primary)"></stop><stop offset="1" stop-color="var(--primary-2)"></stop></linearGradient></defs>' +
+      '<rect x="10" y="10" width="380" height="280" rx="28" fill="var(--surface)" stroke="var(--border)"></rect>' +
+      '<g stroke="url(#hg)" stroke-width="4" fill="none" stroke-linecap="round"><path d="M60 250 L100 90 L140 250 M75 190 H125 M85 140 H115"></path><path d="M180 250 L220 70 L260 250 M195 190 H245 M205 130 H235"></path><path d="M300 250 L330 110 L360 250 M310 190 H350"></path><path d="M100 90 Q160 40 220 70 Q275 80 330 110" stroke-dasharray="6 6"></path></g>' +
+      '<circle cx="220" cy="70" r="8" fill="url(#hg)"><animate attributeName="r" values="6;11;6" dur="2s" repeatCount="indefinite"></animate></circle>' +
+      '<path d="M195 26 l-14 26 h12 l-8 22 22 -30 h-12 l8 -18z" fill="var(--warn)"></path></svg></section>' +
+      '<section class="grid g4">' +
+      '<div class="card"><div class="stat gradient-text">3</div><div class="muted">Courses, one per role</div></div>' +
+      '<div class="card"><div class="stat gradient-text">' + lessons + '</div><div class="muted">Lessons</div></div>' +
+      '<div class="card"><div class="stat gradient-text">' + AREAS.length + '</div><div class="muted">Substation zones mapped</div></div>' +
+      '<div class="card"><div class="stat gradient-text">' + PASS + '%</div><div class="muted">Pass mark for site access</div></div></section>' +
+      '<section class="stack"><div class="eyebrow">Who is entering the site?</div><h2>One academy, three courses</h2><div class="grid g3" style="margin-top:6px">' + roleCards + "</div></section>" +
+      '<section class="card stack"><div class="eyebrow">Site awareness</div><h2>Know the substation before you enter it</h2>' +
+      '<p class="muted" style="max-width:70ch">Every zone is mapped with its hazards and required PPE. When you check in to a zone, VoltSafe remembers it: your map lights up, and the gate log shows who is on site for an emergency roll-call.</p>' +
+      siteMap() + "</section>";
+  }
+
+  function vJoin(role) {
+    var people = Object.keys(S.people).map(function (k) { return S.people[k]; });
+    var picker = Object.keys(ROLES).map(function (k) {
+      var r = ROLES[k];
+      return '<label class="role"><input type="radio" name="role" value="' + k + '" required' + (role === k ? " checked" : "") + '>' +
+        '<span class="tile"><span class="role-ic">' + ICONS[k] + "</span><b>" + esc(r.label) + '</b><span class="muted small">' + esc(r.blurb) + "</span></span></label>";
+    }).join("");
+    var existing = people.length ? '<section class="card stack"><h2>Already registered on this device?</h2><div class="row">' +
+      people.map(function (p) { return '<button class="btn btn-sm" data-switch="' + p.id + '"><span class="avatar">' + esc(initials(p.name)) + "</span>" + esc(p.name) + "</button>"; }).join("") + "</div></section>" : "";
+    return '<section class="card fade" style="max-width:780px;width:100%;margin-inline:auto"><div class="stack">' +
+      '<div class="eyebrow">Enrol</div><h2>Who is entering the substation?</h2><p class="muted">Choose your role and your course is matched to you.</p>' +
+      '<form class="f" id="join-form"><fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;margin-bottom:10px">I am a…</legend><div class="roles">' + picker + "</div></fieldset>" +
+      '<div class="grid g2" style="gap:14px"><label class="fld" for="j-name">Full name<input type="text" id="j-name" name="name" required autocomplete="name" placeholder="e.g. Ama Mensah"></label>' +
+      '<label class="fld" for="j-company">Company or organisation<input type="text" id="j-company" name="company" autocomplete="organization" placeholder="e.g. GRIDCo"></label></div>' +
+      '<div><button class="btn btn-primary" type="submit">Start my training</button></div></form></div></section>' + existing;
+  }
+
+  function vCourse() {
+    var p = me(); if (!p) return needProfile();
+    var st = status(p), t = st.track, pct = Math.round(100 * st.n / st.total);
+    if (ui.lesson >= t.modules.length) ui.lesson = 0;
+    var m = t.modules[ui.lesson], isDone = st.done.indexOf(m.slug) > -1, last = ui.lesson === t.modules.length - 1;
+    var list = t.modules.map(function (x, i) {
+      var d = st.done.indexOf(x.slug) > -1;
+      return '<li><button data-lesson="' + i + '"' + (i === ui.lesson ? ' aria-current="step"' : "") + '><span class="check' + (d ? " done" : "") + '">' + (d ? "✓" : i + 1) + '</span><span style="flex:1;min-width:0"><b>' + esc(x.title) + '</b><br><span class="muted small">' + x.minutes + " min</span></span></button></li>";
+    }).join("");
+    var moved = st.key !== ROLES[p.role].track ? '<div class="notice">Your onboarding certificate has expired, so you have moved up to the <b>Experienced Engineer Refresher</b>.</div>' : "";
+    return '<div class="row between fade"><div><div class="eyebrow">' + esc(ROLES[p.role].label) + '</div><h1 style="font-size:clamp(1.7rem,4vw,2.5rem)">Hello, ' + esc(p.name.split(" ")[0]) + "</h1></div>" + statusPill(st) + "</div>" + moved +
+      '<div class="grid split">' +
+      '<article class="card stack"><div class="row between"><span class="eyebrow">Lesson ' + (ui.lesson + 1) + " of " + t.modules.length + " · " + m.minutes + " min</span>" + (isDone ? '<span class="pill ok">✓ Completed</span>' : "") + "</div>" +
+      '<div class="bar"><span style="width:' + Math.round(100 * (ui.lesson + 1) / t.modules.length) + '%"></span></div>' +
+      "<h2>" + esc(m.title) + '</h2><p class="muted">' + esc(m.summary) + "</p>" +
+      '<ol class="points">' + m.points.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>" +
+      '<div class="row between" style="margin-top:6px">' + (ui.lesson > 0 ? '<button class="btn" data-lesson="' + (ui.lesson - 1) + '">Previous</button>' : "<span></span>") +
+      '<button class="btn btn-primary" data-complete="' + m.slug + '">' + (last ? "Finish and take the assessment" : "Mark complete and continue") + "</button></div></article>" +
+      '<aside class="card stack"><div class="row between" style="flex-wrap:nowrap"><div style="min-width:0"><h3>' + esc(t.title) + '</h3><p class="muted small">' + esc(t.subtitle) + '</p></div><div class="ring" style="--p:' + pct + '"><span>' + pct + "%</span></div></div>" +
+      '<ul class="modules">' + list + "</ul>" +
+      '<div class="row">' + (st.all ? '<a class="btn btn-primary" href="#quiz">' + (st.passed ? "Retake" : "Take") + " the assessment</a>" : '<span class="muted small">Finish every lesson to unlock the assessment.</span>') +
+      (st.state === "valid" ? '<a class="btn" href="#certificate">View certificate</a>' : "") + "</div></aside></div>";
+  }
+
+  function vQuiz() {
+    var p = me(); if (!p) return needProfile();
+    var st = status(p), qs = st.track.quiz, r = ui.result;
+    if (!st.all) return '<section class="card stack"><h2>Assessment locked</h2><p class="muted">Complete every lesson in your course first.</p><div><a class="btn btn-primary" href="#course">Go to my course</a></div></section>';
+    if (r) {
+      return '<section class="card row between fade"><div class="stack" style="gap:6px"><div class="eyebrow">' + esc(st.track.title) + "</div><h1 style=\"font-size:clamp(1.7rem,4vw,2.5rem)\">" + (r.passed ? "You passed" : "Not quite yet") + '</h1><p class="muted">' +
+        (r.passed ? "You are cleared for site access until " + fmt(st.until) + "." : "You need " + PASS + "% to pass. Review the lessons and try again.") +
+        '</p></div><div class="ring" style="--p:' + r.score + '"><span>' + r.score + "%</span></div></section>" +
+        qs.map(function (q, i) {
+          return '<div class="card"><h3>' + (i + 1) + ". " + esc(q.q) + '</h3><div class="opts">' + q.options.map(function (o, j) {
+            var c = j === q.answer ? "right" : j === r.answers[i] ? "wrong" : "";
+            return '<div class="opt ' + c + '"><span class="mark">' + (c === "right" ? "✓" : c === "wrong" ? "✗" : "") + "</span>" + esc(o) + "</div>";
+          }).join("") + "</div></div>";
+        }).join("") +
+        '<div class="row">' + (r.passed ? '<a class="btn btn-primary" href="#certificate">Get my certificate</a><a class="btn" href="#map">Go to the substation map</a>' : '<button class="btn btn-primary" data-retake="1">Retake the assessment</button><a class="btn" href="#course">Review lessons</a>') + "</div>";
+    }
+    return '<div class="stack fade"><div class="eyebrow">Assessment · pass mark ' + PASS + '%</div><h1 style="font-size:clamp(1.7rem,4vw,2.5rem)">' + esc(st.track.title) + '</h1><p class="muted">Answer every question. You can retake the assessment as many times as you need.</p></div>' +
+      '<form id="quiz-form" class="stack" style="gap:16px">' + qs.map(function (q, i) {
+        return '<fieldset class="card q"><legend class="pill">Question ' + (i + 1) + " of " + qs.length + '</legend><h3 style="margin-top:6px">' + esc(q.q) + '</h3><div class="opts">' +
+          q.options.map(function (o, j) { return '<label class="opt"><input type="radio" id="q' + i + "-" + j + '" name="q' + i + '" value="' + j + '" required> ' + esc(o) + "</label>"; }).join("") + "</div></fieldset>";
+      }).join("") + '<div><button class="btn btn-primary" type="submit">Submit answers</button></div></form>';
+  }
+
+  function vCert() {
+    var p = me(); if (!p) return needProfile();
+    var st = status(p);
+    if (st.state !== "valid") return '<section class="card stack"><h2>No valid certificate yet</h2><p class="muted">Pass your course assessment to receive a certificate.</p><div><a class="btn btn-primary" href="#course">Go to my course</a></div></section>';
+    return '<section class="card cert fade" style="max-width:820px;width:100%;margin-inline:auto"><div class="seal">' + BOLT + '</div><div class="eyebrow">Certificate of completion</div>' +
+      '<h1 class="gradient-text" style="font-size:clamp(1.8rem,4.5vw,2.8rem)">' + esc(p.name) + '</h1><p class="muted">' + esc(ROLES[p.role].label) + (p.company ? " · " + esc(p.company) : "") + "</p>" +
+      "<p>has successfully completed the</p><h2>" + esc(st.track.title) + '</h2><p class="muted">Score ' + st.passed.score + "% · Issued " + fmt(st.passed.at) + "<br>Valid until <b>" + fmt(st.until) + "</b></p>" +
+      '<p class="muted small">Certificate ID VS-' + p.id.toUpperCase().slice(-6) + "-" + st.passed.score + '</p><p class="muted small">Show this screen at the substation gate.</p></section>';
+  }
+
+  function vMap() {
+    var p = me();
+    var role = p ? p.role : null, here = p ? openVisit(p.id) : null, visited = p ? visitedBy(p.id) : {};
+    var st = p ? status(p) : null;
+    var code = ui.zone || (here ? here.area : AREAS[0].code), a = AREA[code], v = visited[code];
+    var panel = '<section class="card stack"><div class="row between"><span class="pill risk-' + a.risk + '"><i class="dot"></i>' + a.risk.toUpperCase() + " RISK</span>" + (v ? '<span class="pill ok">✓ Visited ' + v.n + "×</span>" : "") + "</div>" +
+      "<h2>" + esc(a.name) + "</h2>" + (v ? '<p class="muted small">Last visit ' + fmt(v.last) + "</p>" : "") +
+      '<div class="stack" style="gap:6px"><b>Hazards</b><div class="chips">' + a.hazards.map(function (h) { return '<span class="chip">⚠ ' + esc(h) + "</span>"; }).join("") + "</div></div>" +
+      '<div class="stack" style="gap:6px"><b>Required PPE</b><div class="chips">' + a.ppe.map(function (h) { return '<span class="chip">' + esc(h) + "</span>"; }).join("") + "</div></div>" +
+      '<p class="muted small">Open to: ' + a.allowed.map(function (r) { return esc(ROLES[r].label); }).join(", ") + "</p>";
+    if (!p) panel += '<a class="btn btn-primary" href="#join">Enrol to check in</a>';
+    else if (here && here.area === code) panel += '<span class="pill ok">You are checked in here</span>';
+    else if (a.allowed.indexOf(role) < 0) panel += '<span class="pill danger">Not open to ' + esc(ROLES[role].label) + "s</span>";
+    else panel += '<form class="f" id="checkin-form" data-area="' + code + '">' +
+      (role === "visitor" ? '<label class="fld" for="escort">Escorting engineer<input type="text" id="escort" name="escort" required placeholder="Name of your escort"></label>' : "") +
+      '<button class="btn btn-primary" type="submit"' + (st.state !== "valid" ? " disabled" : "") + ">Check in to this zone</button></form>";
+    panel += "</section>";
+
+    var history = p ? S.visits.filter(function (x) { return x.pid === p.id; }).slice().reverse() : [];
+    return '<div class="row between fade"><div class="stack" style="gap:4px"><div class="eyebrow">Site map</div><h1 style="font-size:clamp(1.7rem,4vw,2.5rem)">Power substation</h1>' +
+      '<p class="muted">' + (p ? "Zones you visit are remembered and highlighted. " + Object.keys(visited).length + " of " + AREAS.length + " zones visited." : "Enrol to check in to zones and keep a record of your visits.") + "</p></div>" +
+      (here ? '<div class="row"><span class="pill ok">In ' + esc(AREA[here.area].name) + " since " + fmt(here["in"]) + '</span><button class="btn btn-danger btn-sm" data-checkout="1">Check out</button></div>' : "") + "</div>" +
+      (p && st.state !== "valid" ? '<div class="notice error">Site access is locked until you pass your ' + esc(st.track.title) + '. <a href="#course">Continue training</a></div>' : "") +
+      '<div class="grid split"><div class="card">' + siteMap({ visited: visited, here: here, role: role, selected: code }) + "</div>" + panel + "</div>" +
+      (p ? '<section class="card stack"><h2>My visit history</h2>' + (history.length ? visitTable(history, false) : '<p class="muted">No visits recorded yet. Once your training is complete, check in to a zone to start your log.</p>') + "</section>" : "");
+  }
+
+  function visitTable(rows, withName) {
+    return '<div class="table-wrap"><table><thead><tr>' + (withName ? "<th>Name</th><th>Role</th>" : "") + "<th>Zone</th><th>Risk</th><th>Escort</th><th>Checked in</th><th>Checked out</th></tr></thead><tbody>" +
+      rows.map(function (h) {
+        var a = AREA[h.area], pp = S.people[h.pid];
+        return "<tr>" + (withName ? "<td>" + esc(pp ? pp.name : "Removed") + "</td><td>" + esc(pp ? ROLES[pp.role].label : "") + "</td>" : "") +
+          "<td>" + esc(a.name) + '</td><td class="risk-' + a.risk + '">' + a.risk[0].toUpperCase() + a.risk.slice(1) + "</td><td>" + esc(h.escort || "–") + "</td><td>" + fmt(h["in"]) + "</td><td>" + (h.out ? fmt(h.out) : "On site") + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+  }
+
+  function vGate() {
+    var people = Object.keys(S.people).map(function (k) { return S.people[k]; });
+    var onSite = S.visits.filter(function (v) { return !v.out; });
+    var sts = people.map(function (p) { return { p: p, s: status(p) }; });
+    var counts = {}; S.visits.forEach(function (v) { counts[v.area] = (counts[v.area] || 0) + 1; });
+    var max = Math.max.apply(null, [1].concat(Object.keys(counts).map(function (k) { return counts[k]; })));
+    return '<div class="stack fade" style="gap:6px"><div class="eyebrow">Gate log</div><h1 style="font-size:clamp(1.7rem,4vw,2.5rem)">Site overview</h1>' +
+      '<p class="muted" style="max-width:70ch">Everyone who enrols on this device appears here, so a tablet at the substation gate can act as the site register.</p></div>' +
+      '<section class="grid g4">' +
+      '<div class="card"><div class="stat gradient-text">' + onSite.length + '</div><div class="muted">On site now</div></div>' +
+      '<div class="card"><div class="stat gradient-text">' + sts.filter(function (x) { return x.s.state === "valid"; }).length + "/" + people.length + '</div><div class="muted">Trained and valid</div></div>' +
+      '<div class="card"><div class="stat gradient-text">' + sts.filter(function (x) { return x.s.state === "expired"; }).length + '</div><div class="muted">Refresher overdue</div></div>' +
+      '<div class="card"><div class="stat gradient-text">' + S.visits.length + '</div><div class="muted">Zone visits logged</div></div></section>' +
+      '<section class="card stack"><h2>Emergency roll-call: on site now</h2>' + (onSite.length ? visitTable(onSite, true) : '<p class="muted">Nobody is checked in right now.</p>') + "</section>" +
+      '<section class="card stack"><h2>Visits per zone</h2><div class="grid g4" style="gap:14px">' + AREAS.map(function (a) {
+        var c = counts[a.code] || 0;
+        return '<div class="stack" style="gap:5px"><div class="row between small" style="flex-wrap:nowrap"><span>' + esc(a.name) + "</span><b>" + c + '</b></div><div class="bar"><span style="width:' + Math.round(100 * c / max) + '%"></span></div></div>';
+      }).join("") + "</div></section>" +
+      '<section class="card stack"><h2>People and training status</h2>' + (people.length ? '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Course</th><th>Progress</th><th>Status</th><th>Valid until</th><th></th></tr></thead><tbody>' +
+        sts.map(function (x) {
+          return "<tr><td>" + esc(x.p.name) + (x.p.company ? '<br><span class="muted small">' + esc(x.p.company) + "</span>" : "") + "</td><td>" + esc(ROLES[x.p.role].label) + "</td><td>" + esc(x.s.track.title) + "</td><td>" + x.s.n + "/" + x.s.total + "</td><td>" + statusPill(x.s) + "</td><td>" + (x.s.until ? fmt(x.s.until) : "–") +
+            '</td><td><button class="btn btn-sm" data-switch="' + x.p.id + '">Sign in as</button></td></tr>';
+        }).join("") + "</tbody></table></div>" : '<p class="muted">Nobody has enrolled on this device yet. <a href="#join">Enrol the first person</a>.</p>') + "</section>" +
+      '<section class="card stack"><h2>Full visit log</h2>' + (S.visits.length ? visitTable(S.visits.slice().reverse(), true) : '<p class="muted">No visits recorded yet.</p>') + "</section>" +
+      '<section class="card row between"><div style="min-width:0"><h3>Clear this device</h3><p class="muted small">Removes every person, course result and visit stored in this browser.</p></div>' +
+      (ui.confirmReset ? '<div class="row"><span class="small">Delete everything?</span><button class="btn btn-danger btn-sm" data-reset="yes">Yes, clear all data</button><button class="btn btn-sm" data-reset="no">Cancel</button></div>' : '<button class="btn btn-danger btn-sm" data-reset="ask">Clear data</button>') + "</section>";
+  }
+
+  function needProfile() {
+    return '<section class="card stack" style="max-width:640px"><h2>Enrol first</h2><p class="muted">Tell us who you are so we can match you to the right safety course.</p><div><a class="btn btn-primary" href="#join">Start my training</a></div></section>';
+  }
+
+  /* ---------------- router ---------------- */
+  var VIEWS = { home: vHome, join: vJoin, course: vCourse, quiz: vQuiz, certificate: vCert, map: vMap, gate: vGate };
+  var pendingRole = null;
+  function route() {
+    var name = (location.hash || "#home").slice(1);
+    if (!VIEWS[name]) name = "home";
+    if (name !== "quiz") ui.result = null;
+    if (name !== "gate") ui.confirmReset = false;
+    app.innerHTML = VIEWS[name](pendingRole);
+    pendingRole = null;
+    document.querySelectorAll("[data-nav]").forEach(function (a) {
+      var on = a.dataset.nav === name || (a.dataset.nav === "course" && (name === "quiz" || name === "certificate"));
+      if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+    });
+    renderWho();
+  }
+  function go(name) { if (location.hash === "#" + name) route(); else location.hash = name; window.scrollTo(0, 0); }
+  function renderWho() {
+    var p = me(), el = document.getElementById("who");
+    el.innerHTML = p ? '<div class="who"><span class="avatar">' + esc(initials(p.name)) + '</span><span>' + esc(p.name.split(" ")[0]) + '</span><button class="btn btn-sm" data-signout="1">Switch</button></div>'
+      : '<a class="btn btn-primary btn-sm" href="#join">Enrol</a>';
+  }
+
+  /* ---------------- events ---------------- */
+  document.addEventListener("click", function (e) {
+    var t = e.target.closest("[data-role],[data-lesson],[data-complete],[data-retake],[data-checkout],[data-switch],[data-signout],[data-reset],[data-zone],.skin");
+    if (!t) return;
+    if (t.classList.contains("skin")) { setSkin(t.dataset.skin); return; }
+    if (t.dataset.role) { e.preventDefault(); pendingRole = t.dataset.role; go("join"); return; }
+    if (t.dataset.zone) { ui.zone = t.dataset.zone; if ((location.hash || "#home") !== "#map") go("map"); else route(); return; }
+    if (t.dataset.lesson != null) { ui.lesson = +t.dataset.lesson; route(); window.scrollTo(0, 0); return; }
+    if (t.dataset.complete) {
+      var p = me(), st = status(p);
+      p.progress = p.progress || {}; var arr = p.progress[st.key] = p.progress[st.key] || [];
+      if (arr.indexOf(t.dataset.complete) < 0) arr.push(t.dataset.complete);
+      save();
+      var nxt = st.track.modules.findIndex(function (m) { return arr.indexOf(m.slug) < 0; });
+      if (nxt < 0) { toast("All lessons complete. Time for the assessment."); go("quiz"); }
+      else { ui.lesson = nxt; route(); window.scrollTo(0, 0); }
+      return;
+    }
+    if (t.dataset.retake) { ui.result = null; route(); window.scrollTo(0, 0); return; }
+    if (t.dataset.checkout) {
+      var v = openVisit(S.current); if (v) { v.out = Date.now(); save(); toast("Checked out of " + AREA[v.area].name + ". Your visit has been recorded."); }
+      route(); return;
+    }
+    if (t.dataset.switch) { S.current = t.dataset.switch; save(); ui.lesson = 0; toast("Signed in as " + S.people[S.current].name + "."); go("course"); return; }
+    if (t.dataset.signout) { S.current = null; save(); go("join"); return; }
+    if (t.dataset.reset === "ask") { ui.confirmReset = true; route(); return; }
+    if (t.dataset.reset === "no") { ui.confirmReset = false; route(); return; }
+    if (t.dataset.reset === "yes") { var sk = S.skin; S = blank(); S.skin = sk; save(); ui.confirmReset = false; toast("All data on this device has been cleared."); route(); return; }
+  });
+  document.addEventListener("keydown", function (e) {
+    var z = e.target.closest && e.target.closest("[data-zone]");
+    if (z && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); z.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+  });
+  document.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target, fd = new FormData(f);
+    if (f.id === "join-form") {
+      var name = String(fd.get("name") || "").trim(), role = fd.get("role");
+      if (!name || !ROLES[role]) { toast("Enter your name and choose your role.", "error"); return; }
+      var id = uid();
+      S.people[id] = { id: id, name: name, company: String(fd.get("company") || "").trim(), role: role, created: Date.now(), progress: {}, attempts: [] };
+      S.current = id; ui.lesson = 0; save();
+      toast("Welcome, " + name.split(" ")[0] + ". Your " + TRACKS[ROLES[role].track].title + " is ready.");
+      go("course");
+    } else if (f.id === "quiz-form") {
+      var p = me(), st = status(p), qs = st.track.quiz;
+      var answers = qs.map(function (q, i) { var v = fd.get("q" + i); return v == null ? null : +v; });
+      var score = Math.round(100 * answers.filter(function (a, i) { return a === qs[i].answer; }).length / qs.length);
+      var passed = score >= PASS;
+      p.attempts.push({ track: st.key, score: score, passed: passed, at: Date.now() });
+      save(); ui.result = { score: score, passed: passed, answers: answers }; route(); window.scrollTo(0, 0);
+    } else if (f.id === "checkin-form") {
+      var me_ = me(), a = AREA[f.dataset.area], s2 = status(me_);
+      if (s2.state !== "valid") { toast("Complete or renew your safety training before entering any zone.", "error"); return; }
+      if (a.allowed.indexOf(me_.role) < 0) { toast(ROLES[me_.role].label + "s may not enter the " + a.name + ".", "error"); return; }
+      var escort = String(fd.get("escort") || "").trim();
+      if (me_.role === "visitor" && !escort) { toast("Visitors must name the engineer escorting them.", "error"); return; }
+      var now = Date.now();
+      S.visits.forEach(function (v) { if (v.pid === me_.id && !v.out) v.out = now; });
+      S.visits.push({ id: uid(), pid: me_.id, area: a.code, escort: escort || null, "in": now, out: null });
+      save(); ui.zone = a.code;
+      toast("Checked in to " + a.name + ". Required PPE: " + a.ppe.join(", ") + ".");
+      route();
+    }
+  });
+
+  function setSkin(name) {
+    S.skin = name; save();
+    if (name === "auto") document.documentElement.removeAttribute("data-skin");
+    else document.documentElement.setAttribute("data-skin", name);
+    document.querySelectorAll(".skin").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.skin === name)); });
+  }
+
+  setSkin(S.skin || "auto");
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+</body>
+</html>
