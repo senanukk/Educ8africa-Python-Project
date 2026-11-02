@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ err.code }}{% endblock %}
+{% block content %}
+<div class="card fade-in" style="max-width:560px;margin:48px auto;text-align:center">
+  <div class="stat gradient-text" style="font-size:4rem">{{ err.code }}</div>
+  <h2>{{ err.name }}</h2>
+  <p class="muted">{{ err.description }}</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Back to safety</a>
+</div>
+{% endblock %}

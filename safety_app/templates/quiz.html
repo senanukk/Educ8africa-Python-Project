@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Assessment{% endblock %}
+{% block content %}
+<div class="fade-in" style="max-width:820px;margin:0 auto">
+  <div class="eyebrow">Assessment · pass mark {{ pass_mark }}%</div>
+  <h1 style="font-size:clamp(1.8rem,4vw,2.6rem)">{{ status.track.title }}</h1>
+  <p class="muted">Answer every question. You can retake the assessment as many times as you need.</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    {% for q in questions %}
+      {% set qi = loop.index0 %}
+      <fieldset class="card question" style="border:1px solid var(--border)">
+        <legend class="pill">Question {{ loop.index }} / {{ questions|length }}</legend>
+        <h3 style="margin-top:8px">{{ q.q }}</h3>
+        <div class="options">
+          {% for opt in q.options %}
+            <label class="option"><input type="radio" name="q{{ qi }}" value="{{ loop.index0 }}" required> {{ opt }}</label>
+          {% endfor %}
+        </div>
+      </fieldset>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Submit answers</button>
+  </form>
+</div>
+{% endblock %}

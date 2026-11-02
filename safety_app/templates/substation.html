@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_map.html" import site_map %}
+{% block title %}Substation map{% endblock %}
+{% block content %}
+<div class="row between fade-in" style="margin-bottom:20px">
+  <div>
+    <div class="eyebrow">Live site map</div>
+    <h1 style="font-size:clamp(1.8rem,4vw,2.6rem);margin:0">Power substation</h1>
+    <p class="muted" style="margin:0">Your visited zones are remembered and highlighted. {{ visited|length }} of {{ areas|length }} zones visited.</p>
+  </div>
+  {% if here %}
+    <form method="post" action="{{ url_for('checkout') }}" class="row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <span class="pill ok">📍 In {{ areas_by_code[here.area_code].name }} since {{ here.check_in|nicedate }}</span>
+      <button class="btn btn-danger btn-sm" type="submit">Check out</button>
+    </form>
+  {% endif %}
+</div>
+
+{% if status.state != 'valid' %}
+  <div class="flash error" style="margin-bottom:20px">🔒 Site access is locked until you pass your {{ status.track.title }}. <a href="{{ url_for('dashboard') }}">Continue training →</a></div>
+{% endif %}
+
+<div class="grid split">
+  <div class="card">{{ site_map(areas, visited, here, current_user.role, initial=(request.args.area if request.args.area in areas_by_code else (here.area_code if here else areas[0].code))) }}</div>
+  <div>
+    {% for a in areas %}
+      {% set v = visited.get(a.code) %}
+      {% set allowed = current_user.role in a.allowed %}
+      <section class="card area-panel stack" data-code="{{ a.code }}" {{ 'hidden' if not loop.first }}>
+        <div class="row between">
+          <span class="pill risk-{{ a.risk }}">● {{ a.risk|upper }} RISK</span>
+          {% if v %}<span class="pill ok">✓ Visited {{ v.n }}×</span>{% endif %}
+        </div>
+        <h2 style="margin:0">{{ a.name }}</h2>
+        {% if v %}<p class="muted" style="margin:0">Last visit {{ v.last|nicedate }}</p>{% endif %}
+        <div><b>Hazards</b><div class="chips" style="margin-top:6px">{% for h in a.hazards %}<span class="chip">⚠ {{ h }}</span>{% endfor %}</div></div>
+        <div><b>Required PPE</b><div class="chips" style="margin-top:6px">{% for p in a.ppe %}<span class="chip">🦺 {{ p }}</span>{% endfor %}</div></div>
+        <div class="muted" style="font-size:.88rem">Authorised: {% for r in a.allowed %}{{ ROLES[r].label }}{{ ', ' if not loop.last }}{% endfor %}</div>
+        {% if here and here.area_code == a.code %}
+          <span class="pill ok">📍 You are here</span>
+        {% elif allowed %}
+          <form method="post" action="{{ url_for('checkin') }}" class="form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="area" value="{{ a.code }}">
+            {% if current_user.role == 'visitor' %}
+              <label>Escorting engineer <input type="text" name="escort" required placeholder="Name of your escort"></label>
+            {% endif %}
+            <button class="btn btn-primary" type="submit" {{ 'disabled' if status.state != 'valid' }}>Check in to this area</button>
+          </form>
+        {% else %}
+          <span class="pill danger">🔒 Not authorised for {{ ROLES[current_user.role].label }}s</span>
+        {% endif %}
+      </section>
+    {% endfor %}
+  </div>
+</div>
+
+<section class="card section">
+  <h2>My visit history</h2>
+  {% if history %}
+    <div class="table-wrap"><table>
+      <tr><th>Area</th><th>Risk</th><th>Escort</th><th>Checked in</th><th>Checked out</th></tr>
+      {% for h in history %}
+        {% set a = areas_by_code[h.area_code] %}
+        <tr><td>{{ a.name }}</td><td class="risk-{{ a.risk }}">{{ a.risk|title }}</td><td>{{ h.escort or '-' }}</td>
+          <td>{{ h.check_in|nicedate }}</td><td>{{ h.check_out|nicedate if h.check_out else '📍 On site' }}</td></tr>
+      {% endfor %}
+    </table></div>
+  {% else %}
+    <p class="muted">No visits recorded yet. Once your training is complete, check in to an area to start your log.</p>
+  {% endif %}
+</section>
+{% endblock %}

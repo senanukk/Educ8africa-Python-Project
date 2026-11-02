@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% from "_map.html" import site_map %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+{% set role = ROLES[current_user.role] %}
+{% set pct = (100 * status.modules_done / status.modules_total)|round|int %}
+<div class="row between fade-in" style="margin-bottom:24px">
+  <div>
+    <div class="eyebrow">{{ role.icon }} {{ role.label }}</div>
+    <h1 style="font-size:clamp(1.8rem,4vw,2.6rem)">Hello, {{ current_user.name.split()[0] }}</h1>
+    {% if status.track_key != role.track %}
+      <p class="muted">Your onboarding certificate has expired. You have moved up to the <b>Experienced Engineer Refresher</b>.</p>
+    {% endif %}
+  </div>
+  {% if status.state == 'valid' %}
+    <span class="pill ok">● Cleared for site · {{ status.days_left }} days left</span>
+  {% elif status.state == 'expired' %}
+    <span class="pill danger">● Training expired: refresher required</span>
+  {% else %}
+    <span class="pill warn">● Training required before site access</span>
+  {% endif %}
+</div>
+
+<div class="grid grid-2">
+  <section class="card stack">
+    <div class="row between">
+      <div>
+        <h2 style="margin:0">{{ status.track.title }}</h2>
+        <p class="muted" style="margin:0">{{ status.track.subtitle }}</p>
+      </div>
+      <div class="ring" style="--p: {{ pct }}" data-label="{{ pct }}%"></div>
+    </div>
+    <ul class="module-list">
+      {% for m in status.track.modules %}
+        <li><a href="{{ url_for('module', slug=m.slug) }}">
+          <span class="check {{ 'done' if m.slug in status.done }}">{{ '✓' if m.slug in status.done else loop.index }}</span>
+          <span style="flex:1"><b>{{ m.title }}</b><br><span class="muted" style="font-size:.88rem">{{ m.summary }}</span></span>
+          <span class="muted" style="font-size:.85rem">{{ m.minutes }} min</span>
+        </a></li>
+      {% endfor %}
+    </ul>
+    <div class="row">
+      {% if status.all_modules_done %}
+        <a class="btn btn-primary" href="{{ url_for('quiz') }}">{{ 'Retake' if status.passed else 'Take' }} the assessment</a>
+      {% else %}
+        {% set next_mod = (status.track.modules|rejectattr('slug', 'in', status.done)|list)[0] %}
+        <a class="btn btn-primary" href="{{ url_for('module', slug=next_mod.slug) }}">{{ 'Continue' if status.done else 'Start' }}: {{ next_mod.title }}</a>
+      {% endif %}
+      {% if status.state == 'valid' %}<a class="btn" href="{{ url_for('certificate') }}">🎓 View certificate</a>{% endif %}
+    </div>
+  </section>
+
+  <section class="card stack">
+    <div class="row between">
+      <h2 style="margin:0">My substation footprint</h2>
+      <a class="btn btn-sm" href="{{ url_for('substation') }}">Open map →</a>
+    </div>
+    <div class="grid" style="gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))">
+      <div><div class="stat gradient-text">{{ visited|length }}/{{ areas|length }}</div><div class="muted">Zones visited</div></div>
+      <div><div class="stat gradient-text">{{ visited.values()|sum(attribute='n') }}</div><div class="muted">Check-ins</div></div>
+      <div><div class="stat gradient-text" style="font-size:1.05rem;padding-top:10px">{{ areas_by_code[here.area_code].name if here else 'Off site' }}</div><div class="muted">Current location</div></div>
+    </div>
+    {% if recent %}
+      <h3 style="margin-top:8px">Recent visits</h3>
+      <div class="table-wrap"><table>
+        <tr><th>Area</th><th>In</th><th>Out</th></tr>
+        {% for v in recent %}
+          <tr><td>{{ areas_by_code[v.area_code].name }}</td><td>{{ v.check_in|nicedate }}</td><td>{{ v.check_out|nicedate if v.check_out else 'On site' }}</td></tr>
+        {% endfor %}
+      </table></div>
+    {% endif %}
+  </section>
+</div>
+
+<section class="card section">
+  <h2>Areas you have visited</h2>
+  <p class="muted">Green zones are remembered from your check-ins. Hatched zones are not open to your role.</p>
+  {{ site_map(areas, visited, here, current_user.role) }}
+</section>
+{% endblock %}

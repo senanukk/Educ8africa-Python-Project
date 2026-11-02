@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "_map.html" import site_map %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero fade-in">
+  <div>
+    <div class="eyebrow">Substation Safety Academy</div>
+    <h1>Train smart. <span class="gradient-text">Work live-safe.</span></h1>
+    <p class="lead">VoltSafe gives every person who walks through the substation gate the right safety training: a quick induction for visitors, a full onboarding for new engineers, and a sharp refresher for seasoned engineers. Then it remembers every area you visit.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ url_for('register') }}">Start your training →</a>
+      <a class="btn" href="#tracks">Explore the courses</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <svg viewBox="0 0 400 300">
+      <defs>
+        <linearGradient id="hg" x1="0" x2="1"><stop offset="0" stop-color="var(--primary)"/><stop offset="1" stop-color="var(--primary-2)"/></linearGradient>
+      </defs>
+      <rect x="10" y="10" width="380" height="280" rx="28" fill="var(--surface)" stroke="var(--border)"/>
+      <g stroke="url(#hg)" stroke-width="4" fill="none" stroke-linecap="round">
+        <path d="M60 250 L100 90 L140 250 M75 190 H125 M85 140 H115"/>
+        <path d="M180 250 L220 70 L260 250 M195 190 H245 M205 130 H235"/>
+        <path d="M300 250 L330 110 L360 250 M310 190 H350"/>
+        <path d="M100 90 Q160 40 220 70 Q275 80 330 110" stroke-dasharray="6 6"/>
+      </g>
+      <circle cx="220" cy="70" r="8" fill="url(#hg)"><animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite"/></circle>
+      <path d="M195 30 l-14 26 h12 l-8 22 22 -30 h-12 l8 -18z" fill="var(--warn)"/>
+    </svg>
+  </div>
+</section>
+
+<section class="grid grid-4">
+  <div class="card"><div class="stat gradient-text">3</div><div class="muted">Role-based tracks</div></div>
+  <div class="card"><div class="stat gradient-text">{{ tracks.visitor.modules|length + tracks.new.modules|length + tracks.experienced.modules|length }}</div><div class="muted">Interactive lessons</div></div>
+  <div class="card"><div class="stat gradient-text">{{ areas|length }}</div><div class="muted">Substation zones mapped</div></div>
+  <div class="card"><div class="stat gradient-text">80%</div><div class="muted">Pass mark to get site access</div></div>
+</section>
+
+<section id="tracks" class="section">
+  <div class="eyebrow">Who are you?</div>
+  <h2>One academy, three paths</h2>
+  <div class="grid grid-3" style="margin-top:20px">
+    {% for key, role in ROLES.items() %}
+      {% set t = tracks[role.track] %}
+      <article class="card hover stack">
+        <div style="font-size:2.2rem">{{ role.icon }}</div>
+        <div>
+          <span class="pill">{{ role.label }}</span>
+          <h3 style="margin-top:12px">{{ t.title }}</h3>
+          <p class="muted">{{ role.blurb }} {{ t.subtitle }}</p>
+        </div>
+        <ul class="muted" style="margin:0;padding-left:18px">
+          {% for m in t.modules %}<li>{{ m.title }}</li>{% endfor %}
+        </ul>
+        <div class="row between">
+          <span class="muted">{{ t.modules|sum(attribute='minutes') }} min · valid {{ t.validity_days }} days</span>
+          <a class="btn btn-sm btn-primary" href="{{ url_for('register', role=key) }}">Enrol</a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="eyebrow">Site awareness</div>
+  <h2>Know the substation before you enter it</h2>
+  <p class="muted">Every zone is mapped with its hazards and required PPE. When you check in to an area, VoltSafe remembers it: your personal map lights up, and supervisors can see who is on site for emergency roll-call.</p>
+  <div class="card" style="margin-top:16px">{{ site_map(areas) }}</div>
+</section>
+{% endblock %}

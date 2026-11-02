@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<div class="card fade-in" style="max-width:760px;margin:24px auto">
+  <div class="eyebrow">Enrol</div>
+  <h2>Create your safety training account</h2>
+  <p class="muted">Tell us who you are. Your course is matched to you.</p>
+  <form method="post" class="form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset style="border:0;padding:0;margin:0">
+      <legend style="font-weight:600;margin-bottom:10px">I am a…</legend>
+      <div class="role-choices">
+        {% for key, role in ROLES.items() %}
+          <label class="role-choice">
+            <input type="radio" name="role" value="{{ key }}" required {{ 'checked' if (request.form.role or selected) == key }}>
+            <span class="tile">
+              <span class="emoji">{{ role.icon }}</span>
+              <b>{{ role.label }}</b>
+              <span class="muted" style="font-size:.85rem">{{ role.blurb }}</span>
+            </span>
+          </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <div class="grid grid-2" style="gap:16px">
+      <label>Full name <input type="text" name="name" required value="{{ request.form.name }}" autocomplete="name"></label>
+      <label>Company / organisation <input type="text" name="company" value="{{ request.form.company }}" autocomplete="organization"></label>
+      <label>Email <input type="email" name="email" required value="{{ request.form.email }}" autocomplete="email"></label>
+      <label>Password <input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+    </div>
+    <button class="btn btn-primary" type="submit">Create account &amp; start training</button>
+    <p class="muted" style="margin:0">Already registered? <a href="{{ url_for('login') }}">Sign in</a></p>
+  </form>
+</div>
+{% endblock %}

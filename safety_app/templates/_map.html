@@ -1,0 +1,33 @@
+{% macro site_map(areas, visited={}, here=None, role=None, initial=None) -%}
+<div class="map-wrap">
+  <svg class="site-map" viewBox="0 0 1000 600" role="img" aria-label="Power substation site map" data-href="{{ url_for('substation') }}"{% if initial %} data-initial="{{ initial }}"{% endif %}>
+    <defs>
+      <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="10" height="10" fill="transparent"></rect>
+        <line x1="0" y1="0" x2="0" y2="10" stroke="currentColor" stroke-opacity="0.18" stroke-width="4"></line>
+      </pattern>
+    </defs>
+    <rect x="10" y="10" width="980" height="580" rx="24" fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-dasharray="10 8" stroke-width="2"></rect>
+    {% for a in areas %}
+      {% set v = visited.get(a.code) %}
+      {% set cls = [] %}
+      {% if v %}{% set _ = cls.append('visited') %}{% endif %}
+      {% if here and here.area_code == a.code %}{% set _ = cls.append('here') %}{% endif %}
+      {% if role and role not in a.allowed %}{% set _ = cls.append('locked') %}{% endif %}
+      <g class="zone {{ cls|join(' ') }}" data-code="{{ a.code }}" tabindex="0" role="button"
+         aria-label="{{ a.name }}{% if v %}, visited {{ v.n }} times{% endif %}">
+        <title>{{ a.name }} · {{ a.risk|upper }} risk{% if v %} · visited {{ v.n }}×{% endif %}</title>
+        <rect x="{{ a.x }}" y="{{ a.y }}" width="{{ a.w }}" height="{{ a.h }}" rx="14"></rect>
+        <text x="{{ a.x + 14 }}" y="{{ a.y + 28 }}">{{ a.short or a.name }}</text>
+        <text class="sub" x="{{ a.x + 14 }}" y="{{ a.y + 48 }}">{{ a.risk|upper }} RISK{% if v %} · ✓ {{ v.n }} visit{{ 's' if v.n != 1 }}{% endif %}{% if here and here.area_code == a.code %} · 📍{% endif %}</text>
+      </g>
+    {% endfor %}
+  </svg>
+</div>
+<div class="legend">
+  <span><i class="l-visited"></i>Visited</span>
+  <span><i class="l-here"></i>Current location</span>
+  {% if role %}<span><i class="l-locked"></i>Not authorised for your role</span>{% endif %}
+  <span>Click a zone for hazards, PPE &amp; check-in</span>
+</div>
+{%- endmacro %}
